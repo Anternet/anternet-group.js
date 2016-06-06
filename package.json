@@ -1,0 +1,38 @@
+{
+  "name": "",
+  "version": "",
+  "description": "Anternet library for join and get other peers based on a group id.",
+  "keywords": [
+    "anternet",
+    "group",
+    "p2p",
+    "udp",
+    "peers"
+  ],
+  "main": "hroup.js",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "author": "Moshe Simantov <ms@development.co.il> (https://github.com/moshest)",
+  "license": "MIT",
+  "dependencies": {
+    "anternet": ">=0.3.1",
+    "anternet-peer": "^0.1.0",
+    "anternet-peers-set": "^0.1.1"
+  },
+  "devDependencies": {
+    "eslint": "^2.10.1",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-config-airbnb-base": "^3.0.1",
+    "eslint-plugin-import": "^1.8.0",
+    "mocha": "^2.4.5",
+    "mocha-eslint": "^2.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Anternet/anternet-group.js.git"
+  }
+}
