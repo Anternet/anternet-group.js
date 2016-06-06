@@ -21,7 +21,8 @@
   "dependencies": {
     "anternet": ">=0.3.1",
     "anternet-peer": "^0.1.0",
-    "anternet-peers-set": "^0.1.1"
+    "anternet-peers-set": "^0.1.1",
+    "async": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "eslint": "^2.10.1",

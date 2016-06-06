@@ -32,14 +32,9 @@ group.get(port, address, (err, peers) => {
   peer.forEach(peer => console.log(`${peer.address}:${peer.port}`));
 });
 
-// find and add more peers to the group
-const limit = 500;
-group.findMore(limit, (err, found) => {
-  if (err) throw err;
-  
-  console.log(`found ${found} more peers to group`);
-  group.forEach(peer => console.log(`${peer.address}:${peer.port}`));
-});
+// find and add more peers to the group and keep your group in sync
+const target = 500;
+group.update(target);
 ```
 
 ## License
