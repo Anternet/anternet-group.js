@@ -1,6 +1,6 @@
 {
-  "name": "",
-  "version": "",
+  "name": "anternet-group",
+  "version": "0.1.0",
   "description": "Anternet library for join and get other peers based on a group id.",
   "keywords": [
     "anternet",
@@ -9,7 +9,7 @@
     "udp",
     "peers"
   ],
-  "main": "hroup.js",
+  "main": "group.js",
   "engines": {
     "node": ">=6.0.0"
   },

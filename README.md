@@ -14,7 +14,7 @@
 const Anternet = require('anternet');
 const Group = require('anternet-group');
 
-const id = '<< hash >>';
+const id = '<< hash >>'; 
 
 const anternet = new Anternet();
 const group = new Group(anternet, id);
@@ -26,15 +26,19 @@ const port = 12345;
 group.add(port, address);
 console.log(group.size); // 1
 
+// update and find more peers
+group.update();
+
+group.on('update', (found) => {
+  console.log('peers found: ', found);
+});
+
+// get peers from other peer
 group.get(port, address, (err, peers) => {
   if (err) throw err;
   
   peer.forEach(peer => console.log(`${peer.address}:${peer.port}`));
 });
-
-// find and add more peers to the group and keep your group in sync
-const target = 500;
-group.update(target);
 ```
 
 ## License

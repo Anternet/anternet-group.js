@@ -7,13 +7,17 @@ const Extension = require('./lib/extension');
 
 const BUFFER_ENCODING = 'hex';
 const GET_LIMIT = 50;
-const DETAULT_TARGET = 1000;
+const DEFAULT_LIMIT = 1000;
 const UPDATE_RATIO = 0.1;
+const FIND_EACH_LIMIT = 10;
 
 class Group extends EventEmitter {
 
-  constructor(anternet, hash) {
+  constructor(anternet, hash, limit) {
     super();
+
+    this.anternet = anternet;
+    this.limit = limit || DEFAULT_LIMIT;
 
     if (hash instanceof Buffer) {
       this.hash = hash;
@@ -64,6 +68,9 @@ class Group extends EventEmitter {
   /** peers methods **/
 
   add(port, address) {
+    // const rinfo = this.anternet.address();
+    // if (port === rinfo.port && address === rinfo.address) return this;
+
     return this.peers.add(new Peer(port, address));
   }
 
@@ -80,16 +87,16 @@ class Group extends EventEmitter {
     return this;
   }
 
-  trim(target) {
+  trim(target = this.limit) {
     if (this.size <= target) return this;
 
     const it = this.peers.values();
     for (let i = target; i > 0; i--) it.next();
 
-    let item;
+    let item = it.next();
     do {
-      item = it.next();
       this.peers.delete(item.value);
+      item = it.next();
     } while (!item.done);
 
     return this;
@@ -106,42 +113,46 @@ class Group extends EventEmitter {
   findMore(limit, callback) {
     let found = 0;
 
-    async.eachLimit(this.peers, (peer, next) => {
+    const queue = async.queue((peer, next) => {
       if (found >= limit) return next();
 
-      this.get(peer.port, peer.address, (err, peers) => {
+      this.get(peer.port, peer.address, (err, peersSet) => {
         if (err) {
           this.peers.delete(peer);
           return next();
         }
 
-        peers.forEach(newPeer => {
+        peersSet.forEach(newPeer => {
           if (this.peers.has(newPeer)) return;
 
           found++;
           this.peers.add(newPeer);
+          queue.push(newPeer);
         });
+
+        next();
       });
-    }, (err) => {
-      callback(err, found);
-    });
+    }, FIND_EACH_LIMIT);
+
+    for (const peer of this.peers.values()) {
+      queue.push(peer);
+    }
+
+    queue.drain = () => {
+      callback(null, found);
+    };
 
     return this;
   }
 
-  update(target, callback) {
-    let limit = target || DETAULT_TARGET;
-
-    if (this.size < limit) {
-      limit -= this.size;
-    } else {
-      limit = Math.round(limit * UPDATE_RATIO);
-    }
-
-    if (callback) this.once('update', callback);
+  update(callback) {
+    let limit = this.limit - this.size;
+    if (limit <= 0) limit = Math.round(this.limit * UPDATE_RATIO);
 
     this.findMore(limit, (err, found) => {
-      this.trim(limit);
+      if (!err) this.trim(limit);
+
+      if (callback) callback(found);
       this.emit('update', found);
     });
 
